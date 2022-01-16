@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { authOnRefresh } from "../reducers/Auth";
+import { authOnRefresh } from "../actions/Authentication";
 
 function PrivateRoute() {
   const dispatch = useDispatch();

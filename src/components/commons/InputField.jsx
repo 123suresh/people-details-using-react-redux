@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import React from "react";
 
-function InputField({ label, type, value, onChange }) {
+function InputField({ label, type, value, onChange, error }) {
   return (
     <div className="InputField">
       <TextField
@@ -12,6 +12,7 @@ function InputField({ label, type, value, onChange }) {
         fullWidth
         value={value}
         onChange={onChange}
+        error={error}
       />
     </div>
   );

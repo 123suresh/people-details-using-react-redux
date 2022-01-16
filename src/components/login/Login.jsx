@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import CommonButton from "../commons/CommonButton";
 import InputField from "../commons/InputField";
 import "./Login.scss";
-import { auth } from "../reducers/Auth";
+import { auth } from "../actions/Authentication";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
@@ -23,10 +23,7 @@ function Login() {
     }
   };
 
-  // console.log("we are getting token", localStorage.getItem("token"));
-
   if (isAuthenticated) return <Navigate to="/home" />;
-
   return (
     <div>
       <div className="login__main">
