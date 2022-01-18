@@ -1,11 +1,13 @@
 import { Box } from "@mui/material";
 import React, { useState } from "react";
-import CommonButton from "../commons/CommonButton";
-import InputField from "../commons/InputField";
+import CommonButton from "../common/CommonButton";
+import InputField from "../common/InputField";
 import "./Login.scss";
-import { auth } from "../actions/Authentication";
+import { auth } from "../action/authentication";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
+import setAuthHeader from "../utils/SetAuthHeader";
 
 function Login() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -13,13 +15,21 @@ function Login() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
 
-  const loginName = "a";
-  const loginPassword = "b";
+  const loginName = "suresh@noveltytechnology.com";
+  const loginPassword = "P@ssw0rd";
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (userName === loginName && password === loginPassword) {
-      dispatch(auth(true));
+      axios
+        .post(`${process.env.REACT_APP_API}/auth`, {
+          email: "suresh@noveltytechnology.com",
+          password: "P@ssw0rd",
+        })
+        .then(function (response) {
+          dispatch(auth(response.data.token));
+          setAuthHeader(response.data.token);
+        });
     }
   };
 
@@ -38,7 +48,7 @@ function Login() {
           onSubmit={handleSubmit}
         >
           <InputField
-            label="Username"
+            label="Email"
             type="text"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}

@@ -11,13 +11,17 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import CommonButton from "../commons/CommonButton";
+import CommonButton from "../common/CommonButton";
 import { useDispatch } from "react-redux";
-import { auth } from "../actions/Authentication";
+import { auth } from "../action/authentication";
+import jwt_decode from "jwt-decode";
 
 const pages = ["People Details"];
 
 const ResponsiveAppBar = () => {
+  const token = localStorage.getItem("token");
+  const decoded = jwt_decode(token);
+  const adminName = decoded.name;
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -116,6 +120,7 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+              User: {adminName}
               <CommonButton buttonName="Logout" onClick={handleLogout} />
             </Menu>
           </Box>

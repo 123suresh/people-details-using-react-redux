@@ -1,14 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { authOnRefresh } from "../actions/Authentication";
+import { useSelector } from "react-redux";
 
 function PrivateRoute() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(authOnRefresh(true));
-  }, []);
   const authValue = useSelector((state) => state.auth.isAuthenticated);
+
   return <div>{authValue ? <Outlet /> : <Navigate to="/" />}</div>;
 }
 

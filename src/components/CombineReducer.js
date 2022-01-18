@@ -1,9 +1,11 @@
 import React from "react";
 import { combineReducers } from "redux";
-import auth from "./reducers/Auth";
+import Auth from "./reducers/auth";
+import peopleDetail from "./reducers/people";
 
 const rootReducer = combineReducers({
-  auth,
+  auth: Auth,
+  detail: peopleDetail,
 });
 
 export default rootReducer;
