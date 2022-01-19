@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import ResponsiveAppBar from "../headers/Navbar";
+import ResponsiveAppBar from "../header/Navbar";
 import CommonButton from "../common/CommonButton";
 import "./Home.scss";
-import BasicModal from "../common/Modal";
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,39 +11,68 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useSelector, useDispatch } from "react-redux";
-import { loadPeopleDetail } from "../action/peopleDetail";
+import { getSinglePeople, loadPeopleDetail } from "../../action/crud";
 import { ButtonGroup } from "@mui/material";
-import { deletePeopleDetail } from "../action/deletePeople";
+import BasicReuseModal from "../common/Modal";
+import DraggableDialog from "../common/Dialog";
+import BasicModal from "../common/Modal";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 function Home() {
   const detail = useSelector((state) => state.detail.details);
+  // const singleDetail = useSelector((state) => state.detail.detail);
   let dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
+  const [mode, setMode] = useState(null);
+  // const [add, setAdd] = useState("add");
+  // const [edit, setEdit] = useState("edit");
+
+  const [id, setId] = useState("");
+  const [dialog, setDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleOpen = () => setMode("add");
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   useEffect(() => {
     dispatch(loadPeopleDetail());
   }, []);
 
   const handleDelete = (_id) => {
-    dispatch(deletePeopleDetail(_id));
-    // dispatch();
+    setId(_id);
+    setDialog(true);
+    handleOpenDialog();
+    // dispatch(deletePeopleDetail(_id));
+  };
+
+  const editModal = async (_id) => {
+    await dispatch(getSinglePeople(_id));
+    setMode("edit");
+    // setOpen(true);
   };
 
   return (
     <div>
       <ResponsiveAppBar />
       <div className="add__button">
-        <CommonButton buttonName="add" onClick={handleOpen} />
+        <CommonButton buttonName="add" onClick={() => handleOpen()} />
       </div>
-      <div className="modal">
+      {/* <div className="modal">
         <BasicModal
           open={open}
           handleOpen={handleOpen}
           handleClose={handleClose}
         />
-      </div>
+      </div> */}
       <div className="table">
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -75,18 +103,17 @@ function Home() {
                     <TableCell align="center">{address}</TableCell>
                     <TableCell align="center">{phone}</TableCell>
                     <TableCell align="center">
-                      <ButtonGroup
-                        variant="contained"
-                        aria-label="outlined primary button group"
-                      >
-                        <CommonButton
-                          buttonName="delete"
-                          onClick={() => handleDelete(_id)}
-                          size="small"
+                      <div className="icon">
+                        <DeleteIcon
                           color="error"
+                          onClick={() => handleDelete(_id)}
                         />
-                        <CommonButton buttonName="edit" size="small" />
-                      </ButtonGroup>
+
+                        <EditIcon
+                          color="success"
+                          onClick={() => editModal(_id)}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
@@ -94,6 +121,45 @@ function Home() {
             </TableBody>
           </Table>
         </TableContainer>
+      </div>
+
+      <div className="modal__add">
+        {mode === "add" ? (
+          <BasicModal
+            open
+            handleOpen={handleOpen}
+            // handleClose={handleClose}
+            setMode={setMode}
+            mode={mode}
+          />
+        ) : null}
+      </div>
+      <div className="modal__edit">
+        {/* {openModalonEdit ? ( */}
+        {mode === "edit" ? (
+          <BasicModal
+            open
+            handleOpen={handleOpen}
+            // handleClose={handleClose}
+            setMode={setMode}
+            mode={mode}
+          />
+        ) : null}
+        {/* ) : (
+          ""
+        )} */}
+      </div>
+      <div className="dialog">
+        {dialog ? (
+          <DraggableDialog
+            openDialog={openDialog}
+            handleCloseDialog={handleCloseDialog}
+            handleOpenDialog={handleOpenDialog}
+            id={id}
+          />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

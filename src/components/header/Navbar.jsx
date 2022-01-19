@@ -13,7 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import CommonButton from "../common/CommonButton";
 import { useDispatch } from "react-redux";
-import { auth } from "../action/authentication";
+import { auth } from "../../action/auth";
 import jwt_decode from "jwt-decode";
 
 const pages = ["People Details"];

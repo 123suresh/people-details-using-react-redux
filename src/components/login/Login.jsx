@@ -3,17 +3,19 @@ import React, { useState } from "react";
 import CommonButton from "../common/CommonButton";
 import InputField from "../common/InputField";
 import "./Login.scss";
-import { auth } from "../action/authentication";
+import { auth } from "../../action/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-import setAuthHeader from "../utils/SetAuthHeader";
+import setAuthHeader from "../utils/setAuthHeader";
 
 function Login() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [nameErr, setNameErr] = useState(false);
+  const [passwordErr, setPasswordErr] = useState(false);
 
   const loginName = "suresh@noveltytechnology.com";
   const loginPassword = "P@ssw0rd";
@@ -30,6 +32,13 @@ function Login() {
           dispatch(auth(response.data.token));
           setAuthHeader(response.data.token);
         });
+    } else {
+      if (userName !== loginName) {
+        setNameErr(true);
+      }
+      if (password !== loginPassword) {
+        setPasswordErr(true);
+      }
     }
   };
 
@@ -52,11 +61,15 @@ function Login() {
             type="text"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
+            error={nameErr}
+            helperText={nameErr ? "Invalid username" : ""}
           />
           <InputField
             label="Password"
             type="password"
             value={password}
+            error={passwordErr}
+            helperText={passwordErr ? "Invalid password" : ""}
             onChange={(e) => setPassword(e.target.value)}
           />
           <div>

@@ -1,5 +1,5 @@
 import { createStore, compose, applyMiddleware } from "redux";
-import rootReducer from "./components/CombineReducer";
+import rootReducer from "./combineReducer";
 import thunk from "redux-thunk";
 
 const INITIAL_STATE = {};
