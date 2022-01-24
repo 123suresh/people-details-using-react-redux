@@ -32,10 +32,13 @@ export default function DraggableDialog({
   let dispatch = useDispatch();
 
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
+  const [disable, setDisable] = React.useState(false);
 
-  const handleDelete = () => {
-    dispatch(deletePeopleDetail(id));
+  const handleDelete = async () => {
+    setDisable(true);
+    await dispatch(deletePeopleDetail(id));
     handleCloseDialog();
+    setDisable(false);
     setOpenSnackBar(true);
   };
   return (
@@ -57,8 +60,14 @@ export default function DraggableDialog({
             buttonName="cancel"
             onClick={handleCloseDialog}
             color="error"
+            size="small"
           />
-          <CommonButton buttonName="confirm" onClick={handleDelete} />
+          <CommonButton
+            buttonName="confirm"
+            onClick={handleDelete}
+            size="small"
+            disabled={disable}
+          />
         </DialogActions>
       </Dialog>
       <div className="snack__bar">
@@ -68,9 +77,7 @@ export default function DraggableDialog({
             setOpenSnackBar={setOpenSnackBar}
             note="Detail is successfully deleted"
           />
-        ) : (
-          ""
-        )}
+        ) : null}
       </div>
     </div>
   );

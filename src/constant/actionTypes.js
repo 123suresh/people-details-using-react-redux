@@ -1,7 +1,9 @@
-export const GET_PEOPLES = "GET_PEOPLES";
+export const GET_PEOPLE_START = "GET_PEOPLE_START";
+export const GET_PEOPLE_SUCCESS = "GET_PEOPLE_SUCCESS";
 export const DELETE_PEOPLE = "DELETE_PEOPLE";
 export const ADD_PEOPLE = "ADD_PEOPLE";
 export const IS_AUTH = "IS_AUTH";
 export const AUTH_LOGOUT = "AUTH_LOGOUT";
 export const GET_SINGLE_PEOPLE = "GET_SINGLE_PEOPLE";
 export const UPDATE_PEOPLE = "UPDATE_PEOPLE";
+export const CLEAR_DATA = "CLEAR_DATA";

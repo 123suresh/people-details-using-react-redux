@@ -14,31 +14,19 @@ function Login() {
   const dispatch = useDispatch();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [nameErr, setNameErr] = useState(false);
-  const [passwordErr, setPasswordErr] = useState(false);
+  const [err, setErr] = useState(false);
 
-  const loginName = "suresh@noveltytechnology.com";
-  const loginPassword = "P@ssw0rd";
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (userName === loginName && password === loginPassword) {
-      axios
-        .post(`${process.env.REACT_APP_API}/auth`, {
-          email: "suresh@noveltytechnology.com",
-          password: "P@ssw0rd",
-        })
-        .then(function (response) {
-          dispatch(auth(response.data.token));
-          setAuthHeader(response.data.token);
-        });
-    } else {
-      if (userName !== loginName) {
-        setNameErr(true);
-      }
-      if (password !== loginPassword) {
-        setPasswordErr(true);
-      }
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API}/auth`, {
+        email: userName,
+        password: password,
+      });
+      dispatch(auth(response.data.token));
+      setAuthHeader(response.data.token);
+    } catch (error) {
+      setErr(true);
     }
   };
 
@@ -46,36 +34,45 @@ function Login() {
   return (
     <div>
       <div className="login__main">
-        <h2>Login</h2>
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "40%" },
-          }}
-          noValidate
-          autoComplete="off"
-          onSubmit={handleSubmit}
-        >
-          <InputField
-            label="Email"
-            type="text"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            error={nameErr}
-            helperText={nameErr ? "Invalid username" : ""}
-          />
-          <InputField
-            label="Password"
-            type="password"
-            value={password}
-            error={passwordErr}
-            helperText={passwordErr ? "Invalid password" : ""}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div>
-            <CommonButton type="submit" buttonName="Login" />
+        <div className="login__box">
+          <div className="login__header">
+            <h2>LOGIN</h2>
           </div>
-        </Box>
+          <div className="login__label">
+            <Box
+              component="form"
+              sx={{
+                "& .MuiTextField-root": { m: 1, width: "100%" },
+              }}
+              noValidate
+              autoComplete="off"
+              onSubmit={handleSubmit}
+            >
+              <InputField
+                label="Email"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                error={err}
+                id="user__email"
+              />
+              <InputField
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={err}
+                id="user_password"
+              />
+              <div className="login__button">
+                <CommonButton type="submit" buttonName="Login" />
+              </div>
+              <div className="validation__text">
+                {err ? <p>Invalid email or password</p> : null}
+              </div>
+            </Box>
+          </div>
+        </div>
       </div>
     </div>
   );

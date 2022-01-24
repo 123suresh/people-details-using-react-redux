@@ -15,6 +15,7 @@ import CommonButton from "../common/CommonButton";
 import { useDispatch } from "react-redux";
 import { auth } from "../../action/auth";
 import jwt_decode from "jwt-decode";
+import "./Navbar.scss";
 
 const pages = ["People Details"];
 
@@ -101,7 +102,10 @@ const ResponsiveAppBar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar
+                  alt="Remy Sharp"
+                  src="https://cdn.imgbin.com/3/12/17/imgbin-computer-icons-avatar-user-login-avatar-man-wearing-blue-shirt-illustration-mJrXLG07YnZUc2bH5pGfFKUhX.jpg"
+                />
               </IconButton>
             </Tooltip>
             <Menu
@@ -120,8 +124,11 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              User: {adminName}
-              <CommonButton buttonName="Logout" onClick={handleLogout} />
+              <div className="avatar__text">
+                <h3>{adminName}</h3>
+                <hr />
+                <CommonButton buttonName="Logout" onClick={handleLogout} />
+              </div>
             </Menu>
           </Box>
         </Toolbar>

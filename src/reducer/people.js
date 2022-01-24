@@ -8,7 +8,17 @@ const initialState = {
 
 const peopleDetail = (state = initialState, action) => {
   switch (action.type) {
-    case types.GET_PEOPLES:
+    case types.GET_PEOPLE_START:
+      return {
+        ...state,
+        loading: true,
+      };
+    case types.CLEAR_DATA:
+      return {
+        ...state,
+        ...initialState,
+      };
+    case types.GET_PEOPLE_SUCCESS:
       return {
         ...state,
         details: action.payload,

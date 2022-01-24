@@ -2,16 +2,18 @@ import { deleteRequest, getSingleDetail, updateDetail } from "../services/crud";
 import * as types from "../constant/actionTypes";
 import { getRequest } from "../services/crud";
 import { postRequest } from "../services/crud";
-import axios from "axios";
+
+const getStart = () => ({
+  type: types.GET_PEOPLE_START,
+});
+const getPeople = (peopleData) => ({
+  type: types.GET_PEOPLE_SUCCESS,
+  payload: peopleData,
+});
 
 const deletePeople = (_id) => ({
   type: types.DELETE_PEOPLE,
   payload: _id,
-});
-
-const getPeople = (peopleData) => ({
-  type: types.GET_PEOPLES,
-  payload: peopleData,
 });
 
 const postPeople = () => ({
@@ -28,53 +30,56 @@ const updatedPeople = (updatedDetail) => ({
   payload: updatedDetail,
 });
 
-export const deletePeopleDetail = (_id) => {
-  return function (dispatch) {
-    deleteRequest(_id)
-      .then((resp) => {
-        dispatch(deletePeople(_id));
-      })
-      .catch((error) => console.log(error));
-  };
+export const deletePeopleDetail = (_id) => async (dispatch) => {
+  try {
+    await deleteRequest(_id);
+    dispatch(deletePeople(_id));
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const loadPeopleDetail = () => {
-  return function (dispatch) {
-    getRequest()
-      .then((resp) => {
-        dispatch(getPeople(resp.data.data));
-      })
-      .catch((error) => console.log(error));
-  };
+export const loadPeopleDetail = () => async (dispatch) => {
+  try {
+    const response = await getRequest();
+    dispatch(getPeople(response.data.data));
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const postPeopleDetail = (data) => {
-  return function (dispatch) {
-    postRequest(data)
-      .then((resp) => {
-        dispatch(postPeople());
-        dispatch(loadPeopleDetail());
-      })
-      .catch((error) => console.log(error));
-  };
+export const postPeopleDetail = (data) => async (dispatch) => {
+  try {
+    await postRequest(data);
+    dispatch(postPeople());
+    dispatch(loadPeopleDetail());
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const getSinglePeople = (_id) => {
-  return function (dispatch) {
-    getSingleDetail(_id)
-      .then((resp) => {
-        dispatch(singlePeople(resp.data.data));
-      })
-      .catch((error) => console.log(error));
-  };
+export const getSinglePeople = (_id) => async (dispatch) => {
+  try {
+    const response = await getSingleDetail(_id);
+    dispatch(singlePeople(response.data.data));
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const updatePeople = (singleDetail, _id) => {
+export const updatePeople = (singleDetail, _id) => async (dispatch) => {
+  try {
+    const {
+      data: { data },
+    } = await updateDetail(singleDetail, _id);
+    dispatch(updatedPeople(data));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getStartLoad = () => {
   return function (dispatch) {
-    updateDetail(singleDetail, _id)
-      .then((resp) => {
-        dispatch(updatedPeople(resp));
-      })
-      .catch((error) => console.log(error));
+    dispatch(getStart());
   };
 };
