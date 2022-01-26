@@ -13,6 +13,8 @@ import MenuItem from "@mui/material/MenuItem";
 import SimpleSnackbar from "./SnackBar";
 import maxLengthCheck from "../utils/maxLength";
 import { onlyTextRegex } from "../utils/regex";
+import { addDetail } from "../../services/localStorageCrud";
+import { getItem } from "../utils/localStorage";
 
 const style = {
   position: "absolute",
@@ -36,24 +38,45 @@ const selectGender = [
   },
 ];
 
-export default function BasicModal({ handleOpen, open, setMode, mode }) {
+// const getLocalItem = () => {
+//   const list = localStorage.getItem("detail");
+//   if (list) {
+//     return JSON.parse(localStorage.getItem("detail"));
+//   } else {
+//     return [];
+//   }
+// };
+
+export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
+  //states for localStorage
+  console.log("mode ", index);
+  const detail = getItem();
+  console.log("detail from modal", detail);
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("male");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+
   const singleDetail = useSelector((state) => state.detail.detail);
   const dispatch = useDispatch();
   const [phoneLenErr, setPhoneLenErr] = useState(false);
   const [emailErr, setEmailErr] = useState(false);
   const [err, setErr] = useState({ email: false, phone: false });
-  const [fname, setFname] = useState(mode === "add" ? "" : singleDetail.fname);
-  const [lname, setLname] = useState(mode === "add" ? "" : singleDetail.lname);
-  const [email, setEmail] = useState(mode === "add" ? "" : singleDetail.email);
-  const [gender, setGender] = useState(
-    mode === "add" ? "male" : singleDetail.gender
-  );
-  const [address, setAddress] = useState(
-    mode === "add" ? "" : singleDetail.address
-  );
-  const [phone, setPhone] = useState(mode === "add" ? "" : singleDetail.phone);
+  // const [fname, setFname] = useState(mode === "add" ? "" : singleDetail.fname);
+  // const [lname, setLname] = useState(mode === "add" ? "" : singleDetail.lname);
+  // const [email, setEmail] = useState(mode === "add" ? "" : singleDetail.email);
+  // const [gender, setGender] = useState(
+  //   mode === "add" ? "male" : singleDetail.gender
+  // );
+  // const [address, setAddress] = useState(
+  //   mode === "add" ? "" : singleDetail.address
+  // );
+  // const [phone, setPhone] = useState(mode === "add" ? "" : singleDetail.phone);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(false);
+  // const [detail, setDetail] = useState(getLocalItem());
 
   const handleClose = () => {
     clearFormData();
@@ -76,51 +99,44 @@ export default function BasicModal({ handleOpen, open, setMode, mode }) {
     e.preventDefault();
     setButtonDisable(true);
     const data = { fname, lname, email, gender, address, phone };
-    await dispatch(postPeopleDetail(data));
+    addDetail(data);
+    // setDetail([...detail, data]);
+    // await dispatch(postPeopleDetail(data));
     clearFormData();
     handleClose();
     setButtonDisable(false);
     setOpenSnackBar(true);
   };
 
-  useEffect(() => {
-    if (singleDetail && mode === "edit") {
-      setFname(singleDetail.fname);
-      setLname(singleDetail.lname);
-      setEmail(singleDetail.email);
-      setGender(singleDetail.gender);
-      setAddress(singleDetail.address);
-      setPhone(singleDetail.phone);
-    } else {
-      clearFormData();
-    }
-  }, [singleDetail, mode]);
-
-  // const formValidation = (id) => {
-  //   if (id === "email") {
-  //     const { value } = e.target;
-  //     if (emailRegex.test(value)) {
-  //       setErr({});
-  //     }
+  // useEffect(() => {
+  //   if (singleDetail && mode === "edit") {
+  //     setFname(singleDetail.fname);
+  //     setLname(singleDetail.lname);
+  //     setEmail(singleDetail.email);
+  //     setGender(singleDetail.gender);
+  //     setAddress(singleDetail.address);
+  //     setPhone(singleDetail.phone);
+  //   } else {
+  //     clearFormData();
   //   }
-  // };
+  // }, [singleDetail, mode]);
 
-  const handleEdit = async (e) => {
-    e.preventDefault();
-    setButtonDisable(true);
-    const data = { fname, lname, email, gender, address, phone };
-    phone.length < 10
-      ? setPhoneLenErr(true)
-      : await dispatch(updatePeople(data, singleDetail._id));
-    phone.length < 10 ? setPhoneLenErr(true) : setFname("");
-    phone.length < 10 ? setPhoneLenErr(true) : setLname("");
-    phone.length < 10 ? setPhoneLenErr(true) : setEmail("");
-    phone.length < 10 ? setPhoneLenErr(true) : setAddress("");
-    phone.length < 10 ? setPhoneLenErr(true) : setPhone("");
-    phone.length < 10 ? setPhoneLenErr(true) : handleClose();
-    setButtonDisable(false);
-    phone.length < 10 ? setPhoneLenErr(true) : setOpenSnackBar(true);
-  };
+  // const handleEdit = async (e) => {
+  //   e.preventDefault();
+  //   setButtonDisable(true);
+  //   const data = { fname, lname, email, gender, address, phone };
+  //   phone.length < 10
+  //     ? setPhoneLenErr(true)
+  //     : await dispatch(updatePeople(data, singleDetail._id));
+  //   phone.length < 10 ? setPhoneLenErr(true) : setFname("");
+  //   phone.length < 10 ? setPhoneLenErr(true) : setLname("");
+  //   phone.length < 10 ? setPhoneLenErr(true) : setEmail("");
+  //   phone.length < 10 ? setPhoneLenErr(true) : setAddress("");
+  //   phone.length < 10 ? setPhoneLenErr(true) : setPhone("");
+  //   phone.length < 10 ? setPhoneLenErr(true) : handleClose();
+  //   setButtonDisable(false);
+  //   phone.length < 10 ? setPhoneLenErr(true) : setOpenSnackBar(true);
+  // };
 
   const numValidate = (e) => {
     const { value } = e.target;
@@ -142,6 +158,10 @@ export default function BasicModal({ handleOpen, open, setMode, mode }) {
       setLname(value);
     }
   };
+
+  //for edit in localStorage
+
+  const handleEdit = () => {};
 
   return (
     <div>
