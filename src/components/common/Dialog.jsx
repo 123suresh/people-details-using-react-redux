@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -8,9 +7,15 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import { useDispatch } from "react-redux";
-import { deletePeopleDetail } from "../../action/crud";
+import {
+  deletePeopleDetail,
+  deletePeopleList,
+  deletePeopleLists,
+} from "../../action/crud";
 import CommonButton from "./CommonButton";
 import SimpleSnackbar from "./SnackBar";
+import { deletePeoples } from "../../services/localStorageCrud";
+import { CLEAR_DATA } from "../../constant/actionTypes";
 
 function PaperComponent(props) {
   return (
@@ -25,60 +30,77 @@ function PaperComponent(props) {
 
 export default function DraggableDialog({
   openDialog,
+  // setOpenDialog,
   handleOpenDialog,
   handleCloseDialog,
-  id,
+  deleteId,
+  dialogForExistValue,
+  setDialogForExistValue,
+  closeDialogInModal,
 }) {
   let dispatch = useDispatch();
 
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [disable, setDisable] = React.useState(false);
 
-  const handleDelete = async () => {
+  //for snackbar
+
+  const handleDelete = () => {
     setDisable(true);
-    await dispatch(deletePeopleDetail(id));
+    // setOpenSnackBar(true);
+    dispatch(deletePeopleList(deleteId));
+    // await deletePeoples(deleteId);
+    // await dispatch(deletePeopleDetail(id));
     handleCloseDialog();
     setDisable(false);
-    setOpenSnackBar(true);
   };
+
+  const handleExistedValue = () => {
+    closeDialogInModal();
+  };
+
   return (
-    <div>
+    <>
       <Dialog
-        open={openDialog}
+        open={openDialog || dialogForExistValue}
         onClose={handleCloseDialog}
         PaperComponent={PaperComponent}
         aria-labelledby="draggable-dialog-title"
       >
         <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-          Delete
+          {dialogForExistValue ? "Value Exist" : "Delete"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>Are you sure you want to delete</DialogContentText>
+          <DialogContentText>
+            {dialogForExistValue
+              ? "Email or Phone Number already exist"
+              : "Are you sure you want to delete"}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
+          {dialogForExistValue ? null : (
+            <CommonButton
+              buttonName="cancel"
+              onClick={handleCloseDialog}
+              color="error"
+              size="small"
+            />
+          )}
           <CommonButton
-            buttonName="cancel"
-            onClick={handleCloseDialog}
-            color="error"
-            size="small"
-          />
-          <CommonButton
-            buttonName="confirm"
-            onClick={handleDelete}
+            buttonName={dialogForExistValue ? "Try Again" : "confirm"}
+            onClick={dialogForExistValue ? handleExistedValue : handleDelete}
             size="small"
             disabled={disable}
           />
         </DialogActions>
       </Dialog>
-      <div className="snack__bar">
-        {openSnackBar ? (
-          <SimpleSnackbar
-            openSnackBar={openSnackBar}
-            setOpenSnackBar={setOpenSnackBar}
-            note="Detail is successfully deleted"
-          />
-        ) : null}
-      </div>
-    </div>
+      {/* {openSnackBar ? (
+        <SimpleSnackbar
+          openSnackBar={openSnackBar}
+          setOpenSnackBar={setOpenSnackBar}
+          note="People is successfully deleted"
+        />
+      ) : null} */}
+    </>
   );
 }

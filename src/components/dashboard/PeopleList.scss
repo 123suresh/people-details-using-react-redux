@@ -18,3 +18,18 @@
 .action{
     display: flex;
 }
+.search{
+    width: 300px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    display: flex;
+    border-radius: 5px;
+    border: none;
+    color: gray;
+}
+.search__icon{
+    margin-top: 5px;
+}
+.editIcons{
+    margin-left: 10px;
+}

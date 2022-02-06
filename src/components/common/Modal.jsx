@@ -7,14 +7,19 @@ import InputField from "./InputField";
 import CommonButton from "./CommonButton";
 import "./Modal.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { postPeopleDetail, updatePeople } from "../../action/crud";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import SimpleSnackbar from "./SnackBar";
-import maxLengthCheck from "../utils/maxLength";
-import { onlyTextRegex } from "../utils/regex";
-import { addDetail } from "../../services/localStorageCrud";
+import { emailValidationCheck, maxLengthCheck } from "../utils/maxLength";
+import { emailRegex, onlyTextRegex } from "../utils/regex";
+import { addSinglePeople, updatePeopleList } from "../../action/crud";
+import DraggableDialog from "./Dialog";
+import { emailPhoneValidation } from "../../services/localStorageCrud";
 import { getItem } from "../utils/localStorage";
+import {
+  checkUniqueEmail,
+  checkUniquePhoneNum,
+} from "../utils/emailPhoneValidate";
 
 const style = {
   position: "absolute",
@@ -38,32 +43,20 @@ const selectGender = [
   },
 ];
 
-// const getLocalItem = () => {
-//   const list = localStorage.getItem("detail");
-//   if (list) {
-//     return JSON.parse(localStorage.getItem("detail"));
-//   } else {
-//     return [];
-//   }
-// };
-
-export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
-  //states for localStorage
-  console.log("mode ", index);
-  const detail = getItem();
-  console.log("detail from modal", detail);
+export default function FormModal({ handleOpen, open, setMode, mode, people }) {
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("male");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
-
-  const singleDetail = useSelector((state) => state.detail.detail);
+  // const singleDetail = useSelector((state) => state.detail.detail);
   const dispatch = useDispatch();
   const [phoneLenErr, setPhoneLenErr] = useState(false);
   const [emailErr, setEmailErr] = useState(false);
-  const [err, setErr] = useState({ email: false, phone: false });
+  const [uniqueValueErr, SetUniqueValueErr] = useState(false);
+  const [dialogForExistValue, setDialogForExistValue] = useState(false);
+  // const [err, setErr] = useState({ email: false, phone: false });
   // const [fname, setFname] = useState(mode === "add" ? "" : singleDetail.fname);
   // const [lname, setLname] = useState(mode === "add" ? "" : singleDetail.lname);
   // const [email, setEmail] = useState(mode === "add" ? "" : singleDetail.email);
@@ -81,6 +74,10 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
   const handleClose = () => {
     clearFormData();
     setMode(null);
+    setEmailErr(false);
+  };
+  const closeDialogInModal = () => {
+    setDialogForExistValue(false);
   };
   const clearFormData = () => {
     setFname("");
@@ -95,19 +92,39 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
     setGender(event.target.value);
   };
 
-  const handleAdd = async (e) => {
+  const handleAdd = (e) => {
     e.preventDefault();
-    setButtonDisable(true);
     const data = { fname, lname, email, gender, address, phone };
-    addDetail(data);
-    // setDetail([...detail, data]);
-    // await dispatch(postPeopleDetail(data));
-    clearFormData();
-    handleClose();
-    setButtonDisable(false);
-    setOpenSnackBar(true);
+    if (emailRegex.test(email)) {
+      const existedValueCheck = emailPhoneValidation(data);
+      if (existedValueCheck) {
+        dispatch(addSinglePeople(data));
+        //dispatch({type:OPEN_SNACKBAR,payload:{display:true,msg:'added'}})
+        handleClose();
+        setOpenSnackBar(true);
+        setEmailErr(false);
+      } else {
+        setDialogForExistValue(true);
+      }
+    } else {
+      setEmailErr(true);
+    }
   };
 
+  useEffect(() => {
+    if (mode === "edit") {
+      setFname(people.fname);
+      setLname(people.lname);
+      setEmail(people.email);
+      setGender(people.gender);
+      setAddress(people.address);
+      setPhone(people.phone);
+    } else {
+      clearFormData();
+    }
+  }, [people, mode]);
+
+  //useEffect for people detail api
   // useEffect(() => {
   //   if (singleDetail && mode === "edit") {
   //     setFname(singleDetail.fname);
@@ -138,6 +155,13 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
   //   phone.length < 10 ? setPhoneLenErr(true) : setOpenSnackBar(true);
   // };
 
+  // const emailValidate = (e) => {
+  //   const { value } = e.target;
+  //   if (emailRegex.text(value)) {
+  //     setEmail(value);
+  //   }
+  // };
+
   const numValidate = (e) => {
     const { value } = e.target;
     let maxLength = 11;
@@ -160,11 +184,50 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
   };
 
   //for edit in localStorage
-
-  const handleEdit = () => {};
+  const handleEdit = (e) => {
+    e.preventDefault();
+    const data = { fname, lname, email, gender, address, phone };
+    if (emailRegex.test(email)) {
+      const email = checkUniqueEmail(data);
+      const phone = checkUniquePhoneNum(data);
+      const peopleList = getItem();
+      const index = peopleList.findIndex((el) => el.id === people.id);
+      if (
+        peopleList[index].email !== data.email ||
+        peopleList[index].phone !== data.phone
+      ) {
+        if (email === -1 || phone === -1) {
+          dispatch(updatePeopleList(data, people.id));
+          handleClose();
+          setOpenSnackBar(true);
+          setEmailErr(false);
+        } else {
+          setDialogForExistValue(true);
+        }
+      } else {
+        if (
+          email === -1 ||
+          phone === -1 ||
+          peopleList[index].fname !== data.fname ||
+          peopleList[index].lname !== data.lname ||
+          peopleList[index].gender !== data.gender ||
+          peopleList[index].address !== data.address
+        ) {
+          dispatch(updatePeopleList(data, people.id));
+          handleClose();
+          setOpenSnackBar(true);
+          setEmailErr(false);
+        } else {
+          setDialogForExistValue(true);
+        }
+      }
+    } else {
+      setEmailErr(true);
+    }
+  };
 
   return (
-    <div>
+    <>
       <Modal
         open={open}
         onClose={handleClose}
@@ -195,6 +258,7 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
             label="Email"
             value={email || ""}
             onChange={(e) => setEmail(e.target.value)}
+            error={emailErr === true ? true : null}
           />
           <br />
           <TextField
@@ -257,19 +321,24 @@ export default function BasicModal({ handleOpen, open, setMode, mode, index }) {
           </div>
         </Box>
       </Modal>
-      <div className="snack__bar">
-        {openSnackBar ? (
-          <SimpleSnackbar
-            openSnackBar={openSnackBar}
-            setOpenSnackBar={setOpenSnackBar}
-            note={
-              mode === "edit"
-                ? "Detail edited successfully"
-                : "Detail updated successfully"
-            }
-          />
-        ) : null}
-      </div>
-    </div>
+      {openSnackBar ? (
+        <SimpleSnackbar
+          openSnackBar={openSnackBar}
+          setOpenSnackBar={setOpenSnackBar}
+          note={
+            mode === "edit"
+              ? "Detail edited successfully"
+              : "Detail updated successfully"
+          }
+        />
+      ) : null}
+      {dialogForExistValue ? (
+        <DraggableDialog
+          dialogForExistValue={dialogForExistValue}
+          setDialogForExistValue={setDialogForExistValue}
+          closeDialogInModal={closeDialogInModal}
+        />
+      ) : null}
+    </>
   );
 }

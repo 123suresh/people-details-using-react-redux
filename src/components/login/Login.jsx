@@ -19,18 +19,22 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API}/auth`, {
-        email: userName,
-        password: password,
-      });
-      dispatch(auth(response.data.token));
-      setAuthHeader(response.data.token);
+      if (userName === "" || password === "") {
+        setErr(true);
+      } else {
+        const response = await axios.post(`${process.env.REACT_APP_API}/auth`, {
+          email: userName,
+          password: password,
+        });
+        dispatch(auth(response.data.token));
+        setAuthHeader(response.data.token);
+      }
     } catch (error) {
       setErr(true);
     }
   };
 
-  if (isAuthenticated) return <Navigate to="/home" />;
+  if (isAuthenticated) return <Navigate to="/peopleList" />;
   return (
     <div>
       <div className="login__main">

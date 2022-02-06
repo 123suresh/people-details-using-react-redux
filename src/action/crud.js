@@ -2,6 +2,12 @@ import { deleteRequest, getSingleDetail, updateDetail } from "../services/crud";
 import * as types from "../constant/actionTypes";
 import { getRequest } from "../services/crud";
 import { postRequest } from "../services/crud";
+import { getItem } from "../components/utils/localStorage";
+import {
+  addPeople,
+  delPeople,
+  updatePeopleData,
+} from "../services/localStorageCrud";
 
 const getStart = () => ({
   type: types.GET_PEOPLE_START,
@@ -28,6 +34,39 @@ const singlePeople = (singleData) => ({
 const updatedPeople = (updatedDetail) => ({
   type: types.UPDATE_PEOPLE,
   payload: updatedDetail,
+});
+
+//localStorage
+const getPeopleList = (peopleList) => ({
+  type: types.GET_PEOPLE_LIST,
+  payload: peopleList,
+});
+
+const addPeopleLists = (peopleList) => ({
+  type: types.ADD_PEOPLE_LIST,
+  payload: peopleList,
+});
+const deleteSinglePeople = (id) => ({
+  type: types.DELETE_PEOPLE_LIST,
+  payload: id,
+});
+const updatePeopleLists = (updateData) => ({
+  type: types.UPDATE_PEOPLE_LIST,
+  payload: updateData,
+});
+
+//for global snackbar
+const openSnackBar = () => ({
+  type: types.OPEN_SNACKBAR,
+});
+const closeToast = () => ({
+  type: types.CLOSE_SNACKBAR,
+});
+
+//for sorting
+const peopleAfterSorted = (people) => ({
+  type: types.PEOPLE_AFTER_SORTED,
+  payload: people,
 });
 
 export const deletePeopleDetail = (_id) => async (dispatch) => {
@@ -82,4 +121,43 @@ export const getStartLoad = () => {
   return function (dispatch) {
     dispatch(getStart());
   };
+};
+
+//for localStorage
+export const getPeopleLists = () => (dispatch) => {
+  dispatch(getPeopleList(getItem()));
+};
+
+export const addSinglePeople = (people) => (dispatch) => {
+  const peopleValue = addPeople(people);
+  if (peopleValue) {
+    dispatch(addPeopleLists(peopleValue));
+    return true;
+  }
+};
+
+export const deletePeopleList = (id) => async (dispatch) => {
+  try {
+    await dispatch(deleteSinglePeople(delPeople(id)));
+    dispatch(openSnackBar());
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updatePeopleList = (data, peopleId) => (dispatch) => {
+  const updatedPeople = updatePeopleData(data, peopleId);
+  if (updatedPeople) {
+    dispatch(updatePeopleLists(updatedPeople));
+    return true;
+  }
+};
+
+export const closeSnackBar = () => (dispatch) => {
+  dispatch(closeToast());
+};
+
+//for sorting
+export const sortingPeople = (people) => (dispatch) => {
+  dispatch(peopleAfterSorted(people));
 };
