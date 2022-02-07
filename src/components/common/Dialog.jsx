@@ -13,7 +13,6 @@ import {
   deletePeopleLists,
 } from "../../action/crud";
 import CommonButton from "./CommonButton";
-import SimpleSnackbar from "./SnackBar";
 import { deletePeoples } from "../../services/localStorageCrud";
 import { CLEAR_DATA } from "../../constant/actionTypes";
 
@@ -32,18 +31,18 @@ export default function DraggableDialog({
   openDialog,
   // setOpenDialog,
   handleOpenDialog,
-  handleCloseDialog,
   deleteId,
   dialogForExistValue,
   setDialogForExistValue,
   closeDialogInModal,
+  fname,
+  lname,
+  email,
+  setMode,
 }) {
   let dispatch = useDispatch();
 
-  const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [disable, setDisable] = React.useState(false);
-
-  //for snackbar
 
   const handleDelete = () => {
     setDisable(true);
@@ -55,6 +54,10 @@ export default function DraggableDialog({
     setDisable(false);
   };
 
+  const handleCloseDialog = () => {
+    setMode(false);
+  };
+
   const handleExistedValue = () => {
     closeDialogInModal();
   };
@@ -63,7 +66,7 @@ export default function DraggableDialog({
     <>
       <Dialog
         open={openDialog || dialogForExistValue}
-        onClose={handleCloseDialog}
+        onClose={dialogForExistValue ? handleExistedValue : handleCloseDialog}
         PaperComponent={PaperComponent}
         aria-labelledby="draggable-dialog-title"
       >
@@ -72,9 +75,20 @@ export default function DraggableDialog({
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {dialogForExistValue
-              ? "Email or Phone Number already exist"
-              : "Are you sure you want to delete"}
+            {dialogForExistValue ? (
+              "Email or Phone Number already exist"
+            ) : (
+              <>
+                <span>Are you sure you want to delete</span>
+                <br />
+                <br />
+                <span>
+                  Name: {fname} {lname}
+                </span>
+                <br />
+                <span>Email: {email}</span>
+              </>
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -94,13 +108,6 @@ export default function DraggableDialog({
           />
         </DialogActions>
       </Dialog>
-      {/* {openSnackBar ? (
-        <SimpleSnackbar
-          openSnackBar={openSnackBar}
-          setOpenSnackBar={setOpenSnackBar}
-          note="People is successfully deleted"
-        />
-      ) : null} */}
     </>
   );
 }

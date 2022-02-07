@@ -9,17 +9,16 @@ import "./Modal.scss";
 import { useDispatch, useSelector } from "react-redux";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import SimpleSnackbar from "./SnackBar";
-import { emailValidationCheck, maxLengthCheck } from "../utils/maxLength";
-import { emailRegex, onlyTextRegex } from "../utils/regex";
+import { emailValidationCheck, maxLengthCheck } from "../../utils/maxLength";
+import { emailRegex, onlyTextRegex } from "../../utils/regex";
 import { addSinglePeople, updatePeopleList } from "../../action/crud";
 import DraggableDialog from "./Dialog";
 import { emailPhoneValidation } from "../../services/localStorageCrud";
-import { getItem } from "../utils/localStorage";
+import { getItem } from "../../utils/localStorage";
 import {
   checkUniqueEmail,
   checkUniquePhoneNum,
-} from "../utils/emailPhoneValidate";
+} from "../../utils/emailPhoneValidate";
 
 const style = {
   position: "absolute",
@@ -67,7 +66,6 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
   //   mode === "add" ? "" : singleDetail.address
   // );
   // const [phone, setPhone] = useState(mode === "add" ? "" : singleDetail.phone);
-  const [openSnackBar, setOpenSnackBar] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(false);
   // const [detail, setDetail] = useState(getLocalItem());
 
@@ -101,7 +99,6 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
         dispatch(addSinglePeople(data));
         //dispatch({type:OPEN_SNACKBAR,payload:{display:true,msg:'added'}})
         handleClose();
-        setOpenSnackBar(true);
         setEmailErr(false);
       } else {
         setDialogForExistValue(true);
@@ -183,6 +180,11 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
     }
   };
 
+  const handleEmail = (e) => {
+    setEmailErr(false);
+    setEmail(e.target.value);
+  };
+
   //for edit in localStorage
   const handleEdit = (e) => {
     e.preventDefault();
@@ -193,13 +195,23 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
       const peopleList = getItem();
       const index = peopleList.findIndex((el) => el.id === people.id);
       if (
+        peopleList[index].email !== data.email &&
+        peopleList[index].phone !== data.phone
+      ) {
+        if (email === -1 && phone === -1) {
+          dispatch(updatePeopleList(data, people.id));
+          handleClose();
+          setEmailErr(false);
+        } else {
+          setDialogForExistValue(true);
+        }
+      } else if (
         peopleList[index].email !== data.email ||
         peopleList[index].phone !== data.phone
       ) {
         if (email === -1 || phone === -1) {
           dispatch(updatePeopleList(data, people.id));
           handleClose();
-          setOpenSnackBar(true);
           setEmailErr(false);
         } else {
           setDialogForExistValue(true);
@@ -215,7 +227,6 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
         ) {
           dispatch(updatePeopleList(data, people.id));
           handleClose();
-          setOpenSnackBar(true);
           setEmailErr(false);
         } else {
           setDialogForExistValue(true);
@@ -257,7 +268,8 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
           <InputField
             label="Email"
             value={email || ""}
-            onChange={(e) => setEmail(e.target.value)}
+            // onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmail}
             error={emailErr === true ? true : null}
           />
           <br />
@@ -321,17 +333,6 @@ export default function FormModal({ handleOpen, open, setMode, mode, people }) {
           </div>
         </Box>
       </Modal>
-      {openSnackBar ? (
-        <SimpleSnackbar
-          openSnackBar={openSnackBar}
-          setOpenSnackBar={setOpenSnackBar}
-          note={
-            mode === "edit"
-              ? "Detail edited successfully"
-              : "Detail updated successfully"
-          }
-        />
-      ) : null}
       {dialogForExistValue ? (
         <DraggableDialog
           dialogForExistValue={dialogForExistValue}

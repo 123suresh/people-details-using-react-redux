@@ -2,7 +2,7 @@ import { deleteRequest, getSingleDetail, updateDetail } from "../services/crud";
 import * as types from "../constant/actionTypes";
 import { getRequest } from "../services/crud";
 import { postRequest } from "../services/crud";
-import { getItem } from "../components/utils/localStorage";
+import { getItem } from "../utils/localStorage";
 import {
   addPeople,
   delPeople,
@@ -56,8 +56,9 @@ const updatePeopleLists = (updateData) => ({
 });
 
 //for global snackbar
-const openSnackBar = () => ({
+const openSnackBar = (note) => ({
   type: types.OPEN_SNACKBAR,
+  payload: note,
 });
 const closeToast = () => ({
   type: types.CLOSE_SNACKBAR,
@@ -132,6 +133,7 @@ export const addSinglePeople = (people) => (dispatch) => {
   const peopleValue = addPeople(people);
   if (peopleValue) {
     dispatch(addPeopleLists(peopleValue));
+    dispatch(openSnackBar("people added successfully"));
     return true;
   }
 };
@@ -139,7 +141,7 @@ export const addSinglePeople = (people) => (dispatch) => {
 export const deletePeopleList = (id) => async (dispatch) => {
   try {
     await dispatch(deleteSinglePeople(delPeople(id)));
-    dispatch(openSnackBar());
+    dispatch(openSnackBar("deleted successfully"));
   } catch (error) {
     console.log(error);
   }
@@ -149,6 +151,7 @@ export const updatePeopleList = (data, peopleId) => (dispatch) => {
   const updatedPeople = updatePeopleData(data, peopleId);
   if (updatedPeople) {
     dispatch(updatePeopleLists(updatedPeople));
+    dispatch(openSnackBar("people updated successfully"));
     return true;
   }
 };

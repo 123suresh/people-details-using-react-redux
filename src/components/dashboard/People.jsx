@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { deletePeople } from "../../services/localStorageCrud";
 import CommonButton from "../common/CommonButton";
 import DraggableDialog from "../common/Dialog";
-import { getItem } from "../utils/localStorage";
+import { getItem } from "../../utils/localStorage";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import "./PeopleList.scss";
@@ -11,20 +11,11 @@ import FormModal from "../common/Modal";
 
 function People({ people }) {
   const [mode, setMode] = useState(null);
-  const [dialog, setDialog] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const { fname, lname, email, gender, address, phone, id, key } = people;
 
   const handleDelete = () => {
-    setDialog(true);
-    handleOpenDialog();
+    setMode("delete");
     // setUserDetails(detail);
-  };
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
   };
 
   return (
@@ -62,18 +53,16 @@ function People({ people }) {
         // handleOpen={handleOpen}
         setMode={setMode}
         mode={mode}
-        //for localStorage
-        // index={index}
         people={people}
       />
-      {dialog ? (
+      {mode === "delete" ? (
         <DraggableDialog
-          openDialog={openDialog}
-          handleCloseDialog={handleCloseDialog}
-          handleOpenDialog={handleOpenDialog}
-          // setOpenDialog={setOpenDialog}
+          openDialog={mode === "delete" ? true : false}
+          setMode={setMode}
           deleteId={people.id}
-          // id={id}
+          fname={people.fname}
+          lname={people.lname}
+          email={people.email}
         />
       ) : null}
     </>

@@ -32,12 +32,12 @@ import SearchIcon from "@mui/icons-material/Search";
 
 //mui table pagination
 import TablePagination from "@mui/material/TablePagination";
-import NewSnackbar from "../common/NewSnackBar";
 
 //for sorting
 import TableSortLabel from "@mui/material/TableSortLabel";
-import { sortPeopleAsc, sortPeopleDesc } from "../utils/sorting";
-import { search } from "../utils/search";
+import { sortPeopleAsc, sortPeopleDesc } from "../../utils/sorting";
+import { search } from "../../utils/search";
+import SnackBar from "../common/SnackBar";
 
 function PeopleList() {
   const people = useSelector((state) => state.info.peopleList);
@@ -220,7 +220,7 @@ function PeopleList() {
           />
         </TableContainer>
       </div>
-      {snackBar ? <NewSnackbar /> : null}
+      {snackBar.display ? <SnackBar /> : null}
     </>
   );
 }

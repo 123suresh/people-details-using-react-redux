@@ -1,13 +1,17 @@
-import { getItem } from "../components/utils/localStorage";
+import { getItem } from "../utils/localStorage";
 import * as types from "../constant/actionTypes";
-
+//not working for demo why
 const initialState = {
   details: [],
   detail: {},
   loading: false,
   //localStorage
   peopleList: [],
-  toast: false,
+  // toast: false,
+  toast: {
+    display: false,
+    msg: "",
+  },
 };
 
 const peopleInfo = (state = initialState, action) => {
@@ -87,12 +91,20 @@ const peopleInfo = (state = initialState, action) => {
     case types.OPEN_SNACKBAR:
       return {
         ...state,
-        toast: true,
+        // toast: true,
+        toast: {
+          display: true,
+          msg: action.payload,
+        },
       };
     case types.CLOSE_SNACKBAR:
       return {
         ...state,
-        toast: false,
+        // toast: false,
+        toast: {
+          display: false,
+          msg: "",
+        },
       };
     //for sortings
     case types.PEOPLE_AFTER_SORTED:

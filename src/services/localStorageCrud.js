@@ -1,8 +1,8 @@
 import {
   checkUniqueEmail,
   checkUniquePhoneNum,
-} from "../components/utils/emailPhoneValidate";
-import { getItem, setItem } from "../components/utils/localStorage";
+} from "../utils/emailPhoneValidate";
+import { getItem, setItem } from "../utils/localStorage";
 import { v4 as uuidv4 } from "uuid";
 
 export const emailPhoneValidation = (data) => {

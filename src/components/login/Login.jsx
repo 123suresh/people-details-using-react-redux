@@ -7,7 +7,7 @@ import { auth } from "../../action/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-import setAuthHeader from "../utils/setAuthHeader";
+import setAuthHeader from "../../utils/setAuthHeader";
 
 function Login() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -15,6 +15,16 @@ function Login() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState(false);
+
+  const handleUserName = (e) => {
+    setErr(false);
+    setUserName(e.target.value);
+  };
+
+  const handleUserPassword = (e) => {
+    setErr(false);
+    setPassword(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +66,7 @@ function Login() {
                 label="Email"
                 type="text"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={handleUserName}
                 error={err}
                 id="user__email"
               />
@@ -64,7 +74,7 @@ function Login() {
                 label="Password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleUserPassword}
                 error={err}
                 id="user_password"
               />

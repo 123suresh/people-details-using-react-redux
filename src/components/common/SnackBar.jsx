@@ -1,28 +1,33 @@
 import * as React from "react";
+import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDispatch, useSelector } from "react-redux";
+import { closeSnackBar } from "../../action/crud";
 
-export default function SimpleSnackbar({
-  openSnackBar,
-  setOpenSnackBar,
-  note,
-}) {
-  // const handleClick = () => {
-  //   setOpenSnackBar(true);
-  // };
+export default function SnackBar() {
+  const dispatch = useDispatch();
+  const snackBar = useSelector((state) => state.info.toast);
+  const [open, setOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSnackBar(false);
+
+    setOpen(false);
+    dispatch(closeSnackBar());
   };
 
   const action = (
     <React.Fragment>
       <IconButton
-        size="large"
+        size="small"
         aria-label="close"
         color="inherit"
         onClick={handleClose}
@@ -33,12 +38,14 @@ export default function SimpleSnackbar({
   );
 
   return (
-    <Snackbar
-      open={openSnackBar}
-      autoHideDuration={1000}
-      onClose={handleClose}
-      message={note}
-      action={action}
-    />
+    <div>
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message={snackBar.msg}
+        action={action}
+      />
+    </div>
   );
 }
